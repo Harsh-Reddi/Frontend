@@ -4,9 +4,11 @@ import { FaFacebook, FaGithub, FaHeart, FaLinkedin, FaList, FaLock, FaPhoneVolum
 import { IoMdArrowDropdown } from "react-icons/io";
 import { Link, useLocation } from 'react-router-dom';
 import { BsCart3 } from "react-icons/bs";
+import { useSelector } from 'react-redux';
 
-const Header = ({categories}) => {
+const Header = () => {
     const {pathname} = useLocation()
+    const {categories} = useSelector(state => state.home)
     const [showSidebar, setShowSidebar] = useState(true)
     const [categoryShow, setCategoryShow] = useState(true)
     const [searchValue, setSeatchValue] = useState('')
