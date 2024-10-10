@@ -1,10 +1,39 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 import { FaEye, FaRegHeart } from 'react-icons/fa6';
 import { BsCart3 } from "react-icons/bs";
 import Rating from '../Rating';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { add_to_cart, messageClear } from '../../store/reducers/cartReducer';
+import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 
 const FeatureProducts = ({products}) => {
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const {userInfo} = useSelector(state => state.auth)
+    const {successMessage, errorMessage} = useSelector(state => state.cart)
+    const add_cart = (id) => {
+        if (userInfo) {
+            dispatch(add_to_cart({
+                userId: userInfo.id,
+                quantity: 1,
+                productId: id
+            }))
+        } else {
+            navigate('/login')
+        }
+    }
+    useEffect(() => {
+        if(successMessage){
+            toast.success(successMessage)
+            dispatch(messageClear())
+        }
+        if(errorMessage){
+            toast.error(errorMessage)
+            dispatch(messageClear())
+        }
+    },[successMessage, errorMessage])
+
     return (
         <div className='w-[85%] flex flex-wrap mx-auto'>
             <div className='w-full'>
@@ -31,7 +60,7 @@ const FeatureProducts = ({products}) => {
                                 items-center rounded-full hover:bg-[#852770] hover:text-white hover:rotate-[720deg] transition-all'>
                                     <FaEye />
                                 </Link>
-                                <li className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center 
+                                <li onClick={() => add_cart(p._id)} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center 
                                 items-center rounded-full hover:bg-[#852770] hover:text-white hover:rotate-[720deg] transition-all'>
                                     <BsCart3 />
                                 </li>

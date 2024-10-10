@@ -40,7 +40,7 @@ const Login = () => {
         if(userInfo){
             navigate('/')
         }
-    },[successMessage, errorMessage, userInfo])
+    },[successMessage, errorMessage])
     return (
         <div>
             {
