@@ -13,7 +13,6 @@ export const place_order = createAsyncThunk(
                     orderId: data.orderId
                 }
             })
-            console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
             console.log(error.response)
