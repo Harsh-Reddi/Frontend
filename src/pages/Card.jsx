@@ -26,7 +26,7 @@ const Card = () => {
     }
     useEffect(() => {
         dispatch(get_cart_products(userInfo.id))
-    },[])
+    },[dispatch, userInfo.id])
 
     useEffect(() => {
         if(successMessage){
