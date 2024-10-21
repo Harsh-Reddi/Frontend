@@ -69,7 +69,7 @@ const FeatureProducts = ({products}) => {
                                 items-center rounded-full hover:bg-[#852770] hover:text-white hover:rotate-[720deg] transition-all'>
                                     <FaRegHeart />
                                 </li>
-                                <Link to='/products/details/new' className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center 
+                                <Link to={`/products/details/${p.slug}`} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center 
                                 items-center rounded-full hover:bg-[#852770] hover:text-white hover:rotate-[720deg] transition-all'>
                                     <FaEye />
                                 </Link>

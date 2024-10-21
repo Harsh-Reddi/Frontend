@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {MdEmail } from 'react-icons/md'
 import { FaFacebook, FaGithub, FaHeart, FaLinkedin, FaList, FaLock, FaPhoneVolume, FaTwitter, FaUser } from "react-icons/fa6";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BsCart3 } from "react-icons/bs";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { get_cart_products, get_wishlist_products } from '../store/reducers/cartReducer';
 
 const Header = () => {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const {pathname} = useLocation()
     const {categories} = useSelector(state => state.home)
     const {userInfo} = useSelector(state => state.auth)
     const {cart_product_count, wishlist_count} = useSelector(state => state.cart)
+    console.log(wishlist_count)
     const [showSidebar, setShowSidebar] = useState(true)
     const [categoryShow, setCategoryShow] = useState(true)
     const [searchValue, setSeatchValue] = useState('')
@@ -29,6 +32,15 @@ const Header = () => {
         }
     }
     
+    useEffect(() => {
+        // Fetch cart and wishlist data if user is logged in
+        if (userInfo) {
+            dispatch(get_cart_products(userInfo.id));   // Fetch cart data
+            dispatch(get_wishlist_products(userInfo.id)); // Fetch wishlist data
+        }
+    }, [dispatch, userInfo]); //
+
+      
     return (
         <div className='w-full bg-white'>
             {/* NavBar */}
