@@ -11,13 +11,11 @@ const Header = () => {
     const {pathname} = useLocation()
     const {categories} = useSelector(state => state.home)
     const {userInfo} = useSelector(state => state.auth)
-    const {cart_product_count} = useSelector(state => state.cart)
+    const {cart_product_count, wishlist_count} = useSelector(state => state.cart)
     const [showSidebar, setShowSidebar] = useState(true)
     const [categoryShow, setCategoryShow] = useState(true)
     const [searchValue, setSeatchValue] = useState('')
     const [category, setCategory] = useState('')
-    const user = false
-    const wishlist_count = 3
 
     const search = () => {
         navigate(`/products/search?category=${category}&&value=${searchValue}`)
@@ -108,11 +106,10 @@ const Header = () => {
                                     <div className='flex justify-center gap-5'>
                                         <div className='relative flex justify-center items-center cursor-pointer w-[35px] h-[35px] rounded-full bg-[#e2e2e2]'>
                                             <span className='text-xl text-[#852770]'><FaHeart /></span>
-                                            <div className='w-[20px] h-[20px] absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px]'>
                                                 {
-                                                    wishlist_count
+                                                    wishlist_count !== 0 && <div className='w-[20px] h-[20px] absolute bg-red-500 rounded-full
+                                                     text-white flex justify-center items-center -top-[3px] -right-[5px]'>{wishlist_count}</div>
                                                 }
-                                            </div>
                                         </div>
                                         <div onClick={redirect_cart_page} className='relative flex justify-center items-center cursor-pointer w-[35px] h-[35px] rounded-full bg-[#e2e2e2]'>
                                             <span className='text-xl text-[#852770]'><BsCart3 /></span>
@@ -151,7 +148,7 @@ const Header = () => {
                             </ul>
                         </div>
                         {
-                            user ? <Link className='flex cursor-pointer justify-center items-center gap-2 text-sm text-slate-600' to='/dashboard'>
+                            userInfo ? <Link className='flex cursor-pointer justify-center items-center gap-2 text-sm text-slate-600' to='/dashboard'>
                                 <span><FaUser /></span>
                                 <span>Harshitha Reddy</span>
                             </Link> : <Link className='flex cursor-pointer justify-center items-center gap-2 text-sm text-slate-600' to='/login'>
