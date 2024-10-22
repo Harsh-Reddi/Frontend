@@ -235,6 +235,9 @@ const Details = () => {
                             <div className='text-slate-600'>
                                 <p>{product.description}</p>
                             </div>
+                            <div className='text-slate-600 py-1 font-bold'>
+                                <p>Shop Name: <span className='text-[#852770]'>{product.shopName}</span></p>
+                            </div>
                             <div className='flex gap-3 pb-10 border-b'>
                                 {
                                     product.stock ? <>
