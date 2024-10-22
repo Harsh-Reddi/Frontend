@@ -14,7 +14,6 @@ const Header = () => {
     const {categories} = useSelector(state => state.home)
     const {userInfo} = useSelector(state => state.auth)
     const {cart_product_count, wishlist_count} = useSelector(state => state.cart)
-    console.log(wishlist_count)
     const [showSidebar, setShowSidebar] = useState(true)
     const [categoryShow, setCategoryShow] = useState(true)
     const [searchValue, setSeatchValue] = useState('')
