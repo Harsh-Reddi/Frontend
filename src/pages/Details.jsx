@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { IoIosArrowForward } from 'react-icons/io';
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css'
@@ -12,13 +12,28 @@ import { Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import { useDispatch, useSelector } from 'react-redux';
+import { product_details } from '../store/reducers/homeReducer';
+import toast from 'react-hot-toast';
+import { add_to_cart, add_to_wishlist, messageClear } from '../store/reducers/cartReducer';
 
 const Details = () => {
     const images = [1, 2, 3, 4, 5, 6]
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
     const [image, setImage] = useState('')
     const [state, setState] = useState('reviews')
+    const {slug} = useParams()
+    const {userInfo} = useSelector(state => state.auth)
+    
+    const {successMessage, errorMessage} = useSelector(state => state.cart)
+    const {product, moreProducts, relatedProducts} = useSelector(state => state.home)
     const discount = 10
     const stock = 4
+
+    useEffect(() => {
+        dispatch(product_details(slug))
+    },[slug,dispatch])
 
     const responsive = {
         superLargeDesktop: {
@@ -50,7 +65,101 @@ const Details = () => {
             items: 1
         }
     }
+    const [quantity, setQuantity] = useState(1)
+    const dec = () => {
+        if (quantity > 1) {
+            setQuantity(quantity - 1)
+        } else {
+            
+        }
+    }
 
+    const inc = () => {
+        if (quantity >= product.stock) {
+            toast.error('Out of Stock')
+        } else {
+            setQuantity(quantity + 1)
+        }
+    }
+
+    
+
+    useEffect(() => {
+        if(successMessage){
+            toast.success(successMessage)
+            dispatch(messageClear())
+        }
+        if(errorMessage){
+            toast.error(errorMessage)
+            dispatch(messageClear())
+        }
+    },[successMessage, errorMessage])
+
+
+    const add_cart = (id) => {
+        if (userInfo) {
+            dispatch(add_to_cart({
+                userId: userInfo.id,
+                quantity,
+                productId: product._id
+            }))
+        } else {
+            navigate('/login')
+        }
+    }
+
+    const add_wishlist = () => {
+        if (userInfo) {
+            dispatch(add_to_wishlist({
+                userId: userInfo.id,
+                productId: product._id,
+                name: product.name,
+                price: product.price,
+                image: product.images[0],
+                discount: product.discount,
+                rating: product.rating,
+                slug: product.slug
+            }))
+        } else {
+            navigate('/login')
+        }  
+    }
+
+    const buynow = () => {
+        let price = 0
+        if (product.discount !== 0) {
+            price = product.price - Math.floor((product.price* product.discount)/100)
+        } else {
+            price = product.price
+        }
+        const obj =[
+            {
+                sellerId: product.sellerId,
+                shopName: product.shopName,
+                price: quantity * (price - Math.floor((price * 5)/100)),
+                products: [
+                    {
+                        quantity,
+                        productInfo: product
+                    }
+                ]
+
+            }
+        ]
+        navigate('/shipping', {
+            state: {
+                products: obj,
+                price: price * quantity,
+                shipping_fee: 50,
+                items: quantity
+            }
+        })
+    }
+    
+
+    if (!product || !product.images) {
+        return <div>Loading...</div>; 
+    }
 
     return (
         <div>
@@ -75,9 +184,9 @@ const Details = () => {
                         <div className='flex justify-start items-center text-md text-slate-600 w-full'>
                             <Link to='/'>Home</Link>
                             <span className='pt-1'><IoIosArrowForward /></span>
-                            <Link to='/'>Category</Link>
+                            <Link to='/'>{product.category}</Link>
                             <span className='pt-1'><IoIosArrowForward /></span>
-                            <Link to='/'>Products</Link>
+                            <Link to='/'>{product.name}</Link>
                         </div>
                     </div>
                 </div>
@@ -87,16 +196,16 @@ const Details = () => {
                     <div className='grid grid-cols-2 md-lg:grid-cols-1 gap-8'>
                         <div>
                             <div className='p-5 border'>
-                                <img className='h-[400px] w-full' src={image ? `http://localhost:3000/images/products/${image}.webp` : `http://localhost:3000/images/products/${images[3]}.webp`} alt="" />
+                                <img className='h-[400px] w-full' src={image ? image : product.images[0]} alt="" />
                             </div>
                             <div className='py-3'>
                                 {
-                                    images && <Carousel autoPlay={true} infinite={true} transitionDuration={500} responsive={responsive} >
+                                    product.images && <Carousel autoPlay={true} infinite={true} transitionDuration={500} responsive={responsive} >
                                         {
-                                            images.map((img, i) => {
+                                            product.images.map((img, i) => {
                                                 return (
                                                     <div key={i} onClick={() => setImage(img)}>
-                                                        <img className='h-[120px] cursor-pointer' src={`http://localhost:3000/images/products/${i + 1}.webp`} alt="" />
+                                                        <img className='h-[120px] cursor-pointer' src={img} alt="" />
                                                     </div>
                                                 )
                                             })
@@ -107,7 +216,7 @@ const Details = () => {
                         </div>
                         <div className='flex flex-col gap-5'>
                             <div className='text-3xl text-slate-600 font-bold'>
-                                <h3>Product Name</h3>
+                                <h3>{product.name}</h3>
                             </div>
                             <div className='flex justify-start items-center gap-4'>
                                 <div className='flex items-center text-md'>
@@ -117,34 +226,31 @@ const Details = () => {
                             </div>
                             <div className='text-2xl text-red-500 font-bold flex gap-3'>
                                 {
-                                    discount !== 0 ? <>
-                                        Price: <h2 className='line-through'>$500</h2>
-                                        <h2>${500 - Math.floor((500 * discount) / 100)} (-{discount}%)</h2>
-                                    </> : <h2>Price : $200</h2>
+                                    product.discount !== 0 ? <>
+                                        Price: <h2 className='line-through'>${product.price}</h2>
+                                        <h2>${product.price - Math.floor((product.price * product.discount) / 100)} (-{product.discount}%)</h2>
+                                    </> : <h2>Price : ${product.price}</h2>
                                 }
                             </div>
                             <div className='text-slate-600'>
-                                <p>Experience powerful sound anywhere you go with our Wireless Bluetooth Speaker. This compact yet robust speaker delivers high-definition
-                                     sound with deep bass and crystal-clear highs. With up to 12 hours of playtime on a single charge, you can enjoy your favorite tunes 
-                                     all day long. The speaker is waterproof and dustproof, making it perfect for pool parties, beach outings, or camping trips. 
-                                     Plus, with Bluetooth 5.0 technology, you can connect effortlessly to your smartphone, tablet, or any other Bluetooth-enabled device.</p>
+                                <p>{product.description}</p>
                             </div>
                             <div className='flex gap-3 pb-10 border-b'>
                                 {
-                                    stock ? <>
+                                    product.stock ? <>
                                         <div className='flex bg-slate-200 h-[50px] justify-center items-center text-xl'>
-                                            <div className='px-6 cursor-pointer'>-</div>
-                                            <div className='px-6'>{stock}</div>
-                                            <div className='px-6 cursor-pointer'>+</div>
+                                            <div onClick={dec} className='px-6 cursor-pointer'>-</div>
+                                            <div className='px-6'>{quantity}</div>
+                                            <div onClick={inc} className='px-6 cursor-pointer'>+</div>
                                         </div>
                                         <div>
-                                            <button className='px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-[#852770]/40
+                                            <button onClick={add_cart} className='px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-[#852770]/40
                                              bg-[#852770] text-white rounded-sm'>Add To Cart</button>
                                         </div>
                                     </> : ''
                                 }
                                 <div>
-                                    <div className='h-[50px] w-[50px] flex justify-center items-center cursor-pointer hover:shadow-lg
+                                    <div onClick={add_wishlist} className='h-[50px] w-[50px] flex justify-center items-center cursor-pointer hover:shadow-lg
                                      hover:shadow-cyan-500 bg-cyan-500 text-white rounded-sm'>
                                         <FaHeart/>
                                      </div>
@@ -156,8 +262,8 @@ const Details = () => {
                                     <span>Share On</span>
                                 </div>
                                 <div className='flex flex-col gap-5'>
-                                    <span className={`text-${stock ? 'green' : 'red'}-500 text-md`}>~
-                                        {stock ? `In Stock(${stock})` : 'Out of Stock'}
+                                    <span className={`text-${product.stock ? 'green' : 'red'}-500 text-md`}>~
+                                        {product.stock ? `In Stock(${product.stock})` : 'Out of Stock'}
                                     </span>
                                     <ul className='flex justify-start items-center gap-3'>
                                         <li>
@@ -181,7 +287,7 @@ const Details = () => {
                             </div>
                             <div className='flex gap-3 pb-3'>
                             {
-                                stock ? <button className='px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-green-500/40
+                                product.stock ? <button onClick={buynow}  className='px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-green-500/40
                                 bg-[#2a7a76] text-white rounded-sm'>Buy Now</button>: ''
                             }
                                 <Link to='#' className='px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-red-500/40
@@ -219,28 +325,28 @@ const Details = () => {
                         <div className='w-[28%] md-lg:w-full'>
                             <div className='pl-4 md-lg:pl-0'>
                                 <div className='px-3 py-2 text-slate-600 bg-slate-200'>
-                                    <h2 className='font-bold'>From GleamStreet</h2>
+                                    <h2 className='font-bold'>From {product.shopName}</h2>
                                 </div>
                                 <div className='flex flex-col gap-5 mt-3 border p-3'>
                                     {
-                                        [1,2,3].map((p,i) => {
+                                        moreProducts.map((p,i) => {
                                             return(
                                                 <Link className='block'>
                                                     <div className='relative h-[270px]'>
-                                                        <img className='w-full h-full' src={`http://localhost:3000/images/products/${p}.webp`} alt="" />
+                                                        <img className='w-full h-full' src={p.images[0]} alt="" />
                                                         {
                                                             discount !==0 && <div className='flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full
                                                              bg-red-500 font-semibold text-xs left-2 top-2'>
-                                                               {discount}%
+                                                               {p.discount}%
                                                             </div>
 
                                                         }
                                                     </div>
-                                                    <h2 className='text-slate-600 py-1 font-bold'>Product Name</h2>
+                                                    <h2 className='text-slate-600 py-1 font-bold'>{p.name}</h2>
                                                     <div className='flex gap-2'>
-                                                        <h2 className='text-lg font-bold text-blue-400'>$523</h2>
+                                                        <h2 className='text-lg font-bold text-blue-400'>${p.price}</h2>
                                                         <div className='flex items-center'>
-                                                            <Rating ratings={4.5} />
+                                                            <Rating ratings={p.rating} />
                                                         </div>
                                                     </div>
                                                 </Link>
@@ -277,28 +383,28 @@ const Details = () => {
                     className='mySwiper'
                     >
                         {
-                            [1,2,3,4,5,6].map((p,i) => {
+                            relatedProducts.map((p,i) => {
                                 return(
                                     <SwiperSlide key={i}>
                                         <Link className='block'>
                                             <div className='relative h-[250px]'>
                                                 <div className='w-full h-full'>
-                                                    <img className='w-full h-full' src={`http://localhost:3000/images/products/${p}.webp`} alt="" />
+                                                    <img className='w-full h-full' src={p.images[0]} alt="" />
                                                     <div className='absolute h-full w-full top-0 left-0 bg-[#000] opacity-25 hover:opacity-50 transition-all duration-500'></div>
                                                     {
                                                         discount !==0 && <div className='flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full
                                                             bg-red-500 font-semibold text-xs left-2 top-2'>
-                                                            {discount}%
+                                                            {p.discount}%
                                                         </div>
                                                     }
                                                 </div>
                                             </div>
                                             <div className='p-4 flex flex-col gap-1'>
-                                            <h2 className='text-slate-600 text-lg font-bold'>Product Name</h2>
+                                            <h2 className='text-slate-600 text-lg font-bold'>{p.name}</h2>
                                                 <div className='flex justify-start items-center gap-3'>
-                                                    <h2 className='text-lg font-bold text-blue-400'>$523</h2>
+                                                    <h2 className='text-lg font-bold text-blue-400'>${p.price}</h2>
                                                     <div className='flex'>
-                                                        <Rating ratings={4.5} />
+                                                        <Rating ratings={p.rating} />
                                                     </div>
                                                 </div>
                                             </div>

@@ -33,7 +33,7 @@ export const price_range_products = createAsyncThunk(
     async(_,{rejectWithValue, fulfillWithValue}) => {
         try {
             const {data} = await api.get('/home/price-range-latest-products')
-            console.log(data)
+            // console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
             return rejectWithValue(error.response.data)
@@ -48,7 +48,21 @@ export const query_products = createAsyncThunk(
         try {
             const {data} = await api.get(`/home/query-products?category=${query.category}&&rating=${query.rating}
             &&lowPrice=${query.low}&&highPrice=${query.high}&&sortPrice=${query.sortPrice}&&pageNumber=${query.pageNumber}&&searchValue=${query.searchValue ? query.searchValue : ''}`)
-            console.log(data)
+            // console.log(data)
+            return fulfillWithValue(data)
+        } catch (error) {
+            return rejectWithValue(error.response.data)
+        }
+    }
+)
+//End Method
+
+export const product_details = createAsyncThunk(
+    'product/product_details',
+    async(slug,{rejectWithValue, fulfillWithValue}) => {
+        try {
+            const {data} = await api.get(`/home/product-details/${slug}`)
+            // console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
             return rejectWithValue(error.response.data)
@@ -70,7 +84,10 @@ export const homeReducer = createSlice({
         priceRange : {
             low: 0,
             high: 100
-        }
+        },
+        product: {},
+        relatedProducts: [],
+        moreProducts: []
     },
     reducers: {
 
@@ -94,6 +111,11 @@ export const homeReducer = createSlice({
             state.products = payload.products
             state.totalProduct = payload.totalProduct
             state.parPage = payload.parPage
+        })
+        .addCase(product_details.fulfilled, (state, {payload}) => {
+            state.product = payload.product
+            state.moreProducts = payload.moreProducts
+            state.relatedProducts = payload.relatedProducts
         })
     }
 
