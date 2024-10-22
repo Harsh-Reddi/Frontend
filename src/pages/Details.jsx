@@ -310,7 +310,7 @@ const Details = () => {
                                 </div>
                                 <div>
                                     {
-                                        state === 'reviews' ? <Reviews /> : <p className='py-5 text-slate-600'>
+                                        state === 'reviews' ? <Reviews product= {product} /> : <p className='py-5 text-slate-600'>
                                             Meet your new smart home companion, the Smart Speaker with Voice Assistant. This versatile speaker combines 
                                             excellent sound quality with the convenience of a built-in voice assistant. Ask it to play your favorite songs, 
                                             control your smart home devices, set reminders, or answer questions—all hands-free. With a sleek design and 
