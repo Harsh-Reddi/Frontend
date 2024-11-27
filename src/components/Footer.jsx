@@ -9,7 +9,7 @@ const Footer = () => {
                 <div className='w-3/12 lg:w-4/12 sm:w-full'>
                     <div className='flex flex-col gap-3'>
                         <div className='flex sm:justify-center justify-start items-center'>
-                        <img className='flex w-[130px] h-[90px]' src={`http://localhost:3000/images/logo.png`} alt="logo" /></div>
+                        <img className='flex w-[130px] h-[90px]' src={`https://frontend-lilac-nine.vercel.app/images/logo.png`} alt="logo" /></div>
                         <ul className='flex flex-col gap-2 text-slate-600'>
                             <li>Address: 987 Cedar Street, Building C, Seattle, WA 98109, USA</li>
                             <li>Phone: +(789)123-4567</li>
