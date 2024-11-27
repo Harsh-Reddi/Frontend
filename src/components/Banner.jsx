@@ -31,7 +31,7 @@ const Banner = () => {
                             <Carousel autoPlay={true} infinite={true} arrows={true} showDots={true} responsive={responsive} >
                                 {
                                     [1,2,3,4,5,6].map((img, i) => <Link key={i} to='#'>
-                                        <img src={`http://localhost:3000/images/banner/${img}.jpg`} alt="" />
+                                        <img src={`https://frontend-lilac-nine.vercel.app/images/banner/${img}.jpg`} alt="" />
                                     </Link>)
                                 }
                             </Carousel>
