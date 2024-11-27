@@ -102,7 +102,7 @@ const Register = () => {
                                 </div>
                             </div>
                         <div className='w-full h-full py-4 pr-4'>
-                            <img className='w-full ' src="http://localhost:3000/images/login.jpg" alt="" />
+                            <img className='w-full ' src="https://frontend-lilac-nine.vercel.app/images/login.jpg" alt="" />
                         </div>
                     </div>
                     </div>
